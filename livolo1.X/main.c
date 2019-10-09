@@ -112,7 +112,7 @@ void main(void) {
 #endif
         for (short i = 0; i < n; i++) {
             if (heartbeat_outage()) { // No 50Hz. Work as Push button
-                if (NO_SOCKET_STATE == 0) { // 0 for push button
+                if (NO_SOCKET_MODE == 0) { // 0 for push button
                     if (capsensor_is_button_pressed(i)) {
                         switch_on(i);
                     } else { 

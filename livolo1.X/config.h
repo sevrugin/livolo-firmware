@@ -18,7 +18,7 @@ extern "C" {
 
 //#define TWO_WAY_SWITCH // Enable for two-way switch
     
-#define NO_SOCKET_STATE     0 // How-to wotk if no 50Hz (0 - push, 1 - toggle)
+#define NO_SOCKET_MODE     0 // How-to wotk if no 50Hz (0 - push, 1 - toggle)
     
 // Trip threshold in 1/256 fractions of the average frequency
 // working (empirical) values: 3 for 3V
