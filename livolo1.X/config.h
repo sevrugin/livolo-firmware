@@ -12,11 +12,14 @@ extern "C" {
 // Enable debug serial out, note this also slows down time between sensor reads
 #define DEBUG
 
-    
 // --------------------------------------------------------------------
 // Constants
 // --------------------------------------------------------------------
 
+//#define TWO_WAY_SWITCH // Enable for two-way switch
+    
+#define NO_SOCKET_STATE     0 // How-to wotk if no 50Hz (0 - push, 1 - toggle)
+    
 // Trip threshold in 1/256 fractions of the average frequency
 // working (empirical) values: 3 for 3V
 #define TRIP_THRESHOLD      3
@@ -25,7 +28,7 @@ extern "C" {
 #define HYST_THRESHOLD      2
 
 // Min sensor trips to actually switch
-#define READS_TO_SWITCH     2
+#define READS_TO_SWITCH     1
 
 // If sensor is not released after RELEASE_TIMEOUT cycles, the last frequency
 // is assumed to be the new condition, eg. if dropped some water on the plate.
@@ -58,4 +61,3 @@ extern "C" {
 #endif
 
 #endif	/* CONFIG_H */
-

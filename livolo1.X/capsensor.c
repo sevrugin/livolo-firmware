@@ -4,6 +4,7 @@
 #include "capsensor.h"
 #include "config.h"
 #include "util.h"
+#include "heartbeat.h"
 
 /*
  * ISR
@@ -14,7 +15,7 @@ void interrupt isr()
     // We're only expecting T0IF so panic otherwise
     if (! T0IF) {
         for (;;) {
-            LED ^= 1;
+            LED1 ^= 1;
         }
     }
 #endif
@@ -56,21 +57,27 @@ static uint8_t avgs = 0;
  * Public vars (for debugging from main)
  */
 uint16_t cap_raw;
-uint16_t cap_rolling_avg = 0; // fixed point 12.4
-uint16_t cap_frozen_avg = 0; // fixed point 12.4
-uint8_t cap_cycles = 0;
-
+uint16_t cap_rolling_avg[2] = {0,0}; // fixed point 12.4
+uint16_t cap_frozen_avg[2] = {0,0}; // fixed point 12.4
+uint8_t cap_cycles[2] = {0,0};
+#ifndef TWO_WAY_SWITCH
+    uint8_t CM1[2] = {0b00010111, };
+    uint8_t CM2[2] = {0b00100111, };
+#else
+    uint8_t CM1[2] = {0b00010101, 0b00010111};
+    uint8_t CM2[2] = {0b00100101, 0b00100111};
+#endif
 
 /*
  * Public functions
  */
 
 void
-capsensor_init(void) 
+capsensor_init(uint8_t n) 
 {
     // Configure C1 and C2 as a relaxation oscillator
     // See Microchip AN1101
-    CM1CON0 = 0b00010111; 
+    CM1CON0 = CM1[n]; 
     // C1ON     0------- disable (-> C1OUT=0) to save power
     // C1OUT    -r------ r/o
     // C1OE     --0----- no output on pin
@@ -79,7 +86,7 @@ capsensor_init(void)
     // C1R      -----1-- C1Vin+ = C1Vref
     // C1CH     ------11 C1Vin- = C12IN3-
     
-    CM2CON0 = 0b00100111;
+    CM2CON0 = CM2[n];
     // C2ON     0------- disable (-> C2OUT=0) to save power
     // C2OUT    -r------ r/o
     // C2OE     --1----- connected to pin
@@ -117,7 +124,7 @@ capsensor_init(void)
     // PS2         -----010  1:8 Timer0 rate
     
     // Init rolling average
-    cap_rolling_avg = 0;
+    cap_rolling_avg[n] = 0;
     for (int8_t i = 0; i < 16; i++) {
         CAPSENSOR_START_INT();
         CAPSENSOR_WAIT_T0_OVERFLOW_INT();
@@ -125,47 +132,53 @@ capsensor_init(void)
         // The value in TMR1 is the time (us) elapsed time after 256*8 periods
         // of the relaxation oscillator, thus its frequency is:
         // F = 256*8 / TMR1 MHz
-        cap_rolling_avg += TMR1;
+        cap_rolling_avg[n] += TMR1;
     }
 }
 
 
 bit
-capsensor_is_button_pressed(void)
+capsensor_is_button_pressed(uint8_t n)
 {
     uint8_t do_switch = 0;
+    
+    CM1CON0 = CM1[n]; 
+    CM2CON0 = CM2[n];
     
     CAPSENSOR_START_INT();
     CAPSENSOR_WAIT_T0_OVERFLOW_INT();
     cap_raw = TMR1;
     
-    if (cap_cycles < READS_TO_SWITCH) {
-        if ((int16_t)(cap_raw - cap_rolling_avg / 16) > (int16_t)(TRIP_THRESHOLD * (cap_rolling_avg / 16) / 256)) {
-            cap_cycles++;
-            if (cap_cycles >= READS_TO_SWITCH) {
+    if (cap_cycles[n] < READS_TO_SWITCH) {
+        if ((int16_t)(cap_raw - cap_rolling_avg[n] / 16) > (int16_t)(TRIP_THRESHOLD * (cap_rolling_avg[n] / 16) / 256)) {
+            cap_cycles[n]++;
+            if (cap_cycles[n] >= READS_TO_SWITCH) {
                 do_switch = 1;
             }
         } else {
-            cap_frozen_avg = cap_rolling_avg;
-            cap_cycles = 0;
+            cap_frozen_avg[n] = cap_rolling_avg[n];
+            cap_cycles[n] = 0;
         }
     } else {
-        if ((int16_t)(cap_raw - cap_frozen_avg / 16) > (int16_t)(HYST_THRESHOLD * (cap_frozen_avg / 16) / 256)) {
-            cap_cycles++;
-            if (cap_cycles >= RELEASE_TIMEOUT) {
-                cap_cycles = 0;
+        if ((int16_t)(cap_raw - cap_frozen_avg[n] / 16) > (int16_t)(HYST_THRESHOLD * (cap_frozen_avg[n] / 16) / 256)) {
+            cap_cycles[n]++;
+            if (cap_cycles[n] >= RELEASE_TIMEOUT) {
+                cap_cycles[n] = 0;
+            }
+            if (heartbeat_outage() && (NO_SOCKET_STATE == 0)) {
+                do_switch = 1;
             }
         } else {
-            cap_cycles = 0;
-            cap_rolling_avg = cap_frozen_avg;
+            cap_cycles[n] = 0;
+            cap_rolling_avg[n] = cap_frozen_avg[n];
         }
     }
     
     // when the button is tripped make the rolling every cycle in case we need
     // to adapt to the new situation fast (ie water drop)
     avgs++;
-    if (cap_cycles >= READS_TO_SWITCH || (avgs % AVERAGING_RATE == 0)) {
-        cap_rolling_avg = cap_rolling_avg - cap_rolling_avg / 16 + cap_raw;
+    if (cap_cycles[n] >= READS_TO_SWITCH || (avgs % AVERAGING_RATE == 0)) {
+        cap_rolling_avg[n] = cap_rolling_avg[n] - cap_rolling_avg[n] / 16 + cap_raw;
     }
     
     return do_switch;

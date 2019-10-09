@@ -80,8 +80,11 @@ void main(void) {
     while (HTS == 0) ;
     
     switch_init();
-    capsensor_init();
-
+    capsensor_init(0);
+#ifdef TWO_WAY_SWITCH
+    capsensor_init(1);
+#endif
+    
     // WDT prescaler
     CLRWDT();
     WDTCON  = 0b00001010;
@@ -94,28 +97,56 @@ void main(void) {
 
 #ifdef TIME_TO_SHUTDOWN
         heartbeat_update();
-        if (heartbeat_outage()) {
-            // Switch off only if we're on so as not to energize the coil
-            // pointlessly, which would drain the cap and cause voltage
-            // drops everywhere.
-            if (switch_status == SWITCH_ON) {
-                switch_off();
+//        if (heartbeat_outage()) { // No 50Hz
+//            // Switch off only if we're on so as not to energize the coil
+//            // pointlessly, which would drain the cap and cause voltage
+//            // drops everywhere.
+//            switch_off(1);
+//            switch_off(2);
+//            }
+//        }
+#endif
+        short n = 1; // Number of switches
+#ifdef TWO_WAY_SWITCH
+        n = 2;
+#endif
+        for (short i = 0; i < n; i++) {
+            if (heartbeat_outage()) { // No 50Hz. Work as Push button
+                if (NO_SOCKET_STATE == 0) { // 0 for push button
+                    if (capsensor_is_button_pressed(i)) {
+                        switch_on(i);
+                    } else { 
+                        switch_off(i);
+                    }
+                } else { // 1 for toggle button
+                    switch_toggle(i);
+                }
+            } else {
+                if (capsensor_is_button_pressed(i)) {
+                    switch_toggle(i);
+                }
             }
         }
-#endif
         
-        if ((capsensor_is_button_pressed() || extrigger_read()) && !heartbeat_outage()) {
-            switch_toggle();
-        }
-
 #ifdef DEBUG
         printf("%u,%u,%u,%u,%u,%u\r\n", 
-                cap_rolling_avg / 16, 
-                cap_frozen_avg / 16, 
+                cap_rolling_avg[0] / 16, 
+                cap_frozen_avg[0] / 16, 
                 cap_raw,
-                cap_cycles,
+                cap_cycles[0],
                 heartbeat_cycles,
-                switch_status);
+                switch_status[0]);
+#ifdef TWO_WAY_SWITCH
+        printf("%u,%u,%u,%u,%u,%u\r\n", 
+                cap_rolling_avg[1] / 16, 
+                cap_frozen_avg[1] / 16, 
+                cap_raw,
+                cap_cycles[1],
+                heartbeat_cycles,
+                switch_status[1]);
+
+#endif
+        
 #endif
 
         SWDTEN = 1;

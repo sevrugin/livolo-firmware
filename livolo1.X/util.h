@@ -10,7 +10,8 @@ extern "C" {
 /*
  * Shared constants
  */
-#define LED         RB6
+#define LED1         RB6
+#define LED2         RC5
 #define LED_BLUE    0
 #define LED_RED     1
 

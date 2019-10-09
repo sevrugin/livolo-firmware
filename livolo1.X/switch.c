@@ -17,7 +17,7 @@
  * Public vars
  */
 
-bit switch_status;
+uint8_t switch_status[2];
 
 /*
  * Public functions
@@ -35,8 +35,9 @@ void
 switch_preinit()
 {
     RELAY1_R = RELAY1_S = 0;
-    LED = LED_RED;
-    switch_status = SWITCH_OFF;
+    RELAY2_R = RELAY2_S = 0;
+    LED1 = LED2 = LED_RED;
+    switch_status[0] = switch_status[1] = SWITCH_OFF;
 }
 
 void
@@ -50,7 +51,7 @@ switch_init()
     TMR1 = 0;
     TMR1ON = 1;
     while (t) {
-        if (pwmt == pwmd || (pwmt ^ pwmd) == 0xff) LED = ~LED;
+        if (pwmt == pwmd || (pwmt ^ pwmd) == 0xff) LED1 = ~LED1;
         if (++pwmt == 0) pwmd += POLICE_LIGHTS_FREQ;
         if (TMR1IF) { 
             t--;
@@ -58,42 +59,67 @@ switch_init()
         }
     }
     TMR1ON = 0;
-    switch_off();
+    switch_off(0);
+    switch_off(1);
 }
 
 
 void
-switch_toggle()
+switch_toggle(uint8_t n)
 {
-    if (switch_status) {
-        switch_off();
+    if (switch_status[n]) {
+        switch_off(n);
     } else {
-        switch_on();
+        switch_on(n);
     }
 }
 
 
 void
-switch_on(void)
+switch_on(uint8_t n)
 {
-    switch_status = SWITCH_ON;
-    RELAY1_S = 1;
-    CLK_125KHZ();
-    DELAY_125KHZ(RELAY_OP_TIME);
-    RELAY1_S = 0;
-    CLK_4MHZ();
-    LED = LED_RED;
+    switch_status[n] = SWITCH_ON;
+    switch (n) {
+        case 1:
+            RELAY2_S = 1;
+            CLK_125KHZ();
+            DELAY_125KHZ(RELAY_OP_TIME);
+            RELAY2_S = 0;
+            CLK_4MHZ();
+            LED2 = LED_RED;
+            break;
+        default: // 0
+            RELAY1_S = 1;
+            CLK_125KHZ();
+            DELAY_125KHZ(RELAY_OP_TIME);
+            RELAY1_S = 0;
+            CLK_4MHZ();
+            LED1 = LED_RED;
+            break;
+    }
 }
 
 void
-switch_off(void)
+switch_off(uint8_t n)
 {
-    switch_status = SWITCH_OFF;
-    CLK_125KHZ();
-    RELAY1_R = 1;
-    DELAY_125KHZ(RELAY_OP_TIME);
-    RELAY1_R = 0;
-    CLK_4MHZ();
-    LED = LED_BLUE;
+    switch_status[n] = SWITCH_OFF;
+    switch (n) {
+        case 1:
+            RELAY2_R = 1;
+            CLK_125KHZ();
+            DELAY_125KHZ(RELAY_OP_TIME);
+            RELAY2_R = 0;
+            CLK_4MHZ();
+            LED2 = LED_BLUE;
+            break;
+        default: // 0
+            RELAY1_R = 1;
+            CLK_125KHZ();
+            DELAY_125KHZ(RELAY_OP_TIME);
+            RELAY1_R = 0;
+            CLK_4MHZ();
+            LED1 = LED_BLUE;
+            break;
+    }
 }
 
