@@ -5,6 +5,10 @@
 extern "C" {
 #endif
 
+typedef enum {
+    SOCKET_MODE_PUSH,
+    SOCKET_MODE_TOGGLE
+};
 // --------------------------------------------------------------------
 // Compilation flags
 // --------------------------------------------------------------------
@@ -16,9 +20,10 @@ extern "C" {
 // Constants
 // --------------------------------------------------------------------
 
-#define TWO_WAY_SWITCH      // Enable for two-way switch
+#define TWO_TOGGLE_SWITCH      // Enable for two-way switch
     
-#define NO_SOCKET_MODE     1 // How-to wotk if no 50Hz (0 - push, 1 - toggle)
+#define NO_SOCKET_MODE      SOCKET_MODE_PUSH // How-to wotk if no 50Hz
+#define NO_SOCKET_INVERT_MODE  1   // If 1 then OFF=HIGH and ON=LOW voltage
 
 /*
  * Relay switch type

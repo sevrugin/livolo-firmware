@@ -60,7 +60,7 @@ uint16_t cap_raw;
 uint16_t cap_rolling_avg[2] = {0,0}; // fixed point 12.4
 uint16_t cap_frozen_avg[2] = {0,0}; // fixed point 12.4
 uint8_t cap_cycles[2] = {0,0};
-#ifndef TWO_WAY_SWITCH
+#ifndef TWO_TOGGLE_SWITCH
     uint8_t CM1[2] = {0b00010111, };
     uint8_t CM2[2] = {0b00100111, };
 #else
@@ -165,7 +165,7 @@ capsensor_is_button_pressed(uint8_t n)
             if (cap_cycles[n] >= RELEASE_TIMEOUT) {
                 //cap_cycles[n] = 0;
             }
-            if (no_50hz() && (NO_SOCKET_MODE == 0)) {
+            if (no_50hz() && (NO_SOCKET_MODE == SOCKET_MODE_PUSH)) {
                 do_switch = 1;
             }
         } else {

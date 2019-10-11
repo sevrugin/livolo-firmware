@@ -81,7 +81,7 @@ void main(void) {
     
     switch_init();
     capsensor_init(0);
-#ifdef TWO_WAY_SWITCH
+#ifdef TWO_TOGGLE_SWITCH
     capsensor_init(1);
 #endif
     
@@ -107,12 +107,12 @@ void main(void) {
 //        }
 #endif
         short n = 1; // Number of switches
-#ifdef TWO_WAY_SWITCH
+#ifdef TWO_TOGGLE_SWITCH
         n = 2;
 #endif
         for (uint8_t i = 0; i < n; i++) {
             if (no_50hz()) { // No 50Hz. Work as Push button
-                if (NO_SOCKET_MODE == 0) { // 0 for push button
+                if (NO_SOCKET_MODE == SOCKET_MODE_PUSH) { // 0 for push button
                     if (capsensor_is_button_pressed(i)) {
                         switch_on(i);
                     } else { 
@@ -136,7 +136,7 @@ void main(void) {
                 cap_cycles[0],
                 heartbeat_cycles,
                 switch_status[0]);
-#ifdef TWO_WAY_SWITCH
+#ifdef TWO_TOGGLE_SWITCH
         printf("%u,%u,%u,%u,%u,%u\r\n", 
                 cap_rolling_avg[1] / 16, 
                 cap_frozen_avg[1] / 16, 
