@@ -110,15 +110,15 @@ void main(void) {
 #ifdef TWO_WAY_SWITCH
         n = 2;
 #endif
-        for (short i = 0; i < n; i++) {
-            if (heartbeat_outage()) { // No 50Hz. Work as Push button
+        for (uint8_t i = 0; i < n; i++) {
+            if (no_50hz()) { // No 50Hz. Work as Push button
                 if (NO_SOCKET_MODE == 0) { // 0 for push button
                     if (capsensor_is_button_pressed(i)) {
                         switch_on(i);
                     } else { 
                         switch_off(i);
                     }
-                } else { // 1 for toggle button
+                } else if (capsensor_is_button_pressed(i)) { // 1 for toggle button
                     switch_toggle(i);
                 }
             } else {

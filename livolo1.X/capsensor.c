@@ -163,9 +163,9 @@ capsensor_is_button_pressed(uint8_t n)
         if ((int16_t)(cap_raw - cap_frozen_avg[n] / 16) > (int16_t)(HYST_THRESHOLD * (cap_frozen_avg[n] / 16) / 256)) {
             cap_cycles[n]++;
             if (cap_cycles[n] >= RELEASE_TIMEOUT) {
-                cap_cycles[n] = 0;
+                //cap_cycles[n] = 0;
             }
-            if (heartbeat_outage() && (NO_SOCKET_MODE == 0)) {
+            if (no_50hz() && (NO_SOCKET_MODE == 0)) {
                 do_switch = 1;
             }
         } else {

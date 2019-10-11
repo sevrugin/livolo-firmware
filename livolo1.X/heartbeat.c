@@ -49,7 +49,7 @@ heartbeat_update(void)
 }
 
 bit
-heartbeat_outage(void)
+no_50hz(void)
 {
 #ifdef TIME_TO_SHUTDOWN
     return heartbeat_cycles > TIME_TO_SHUTDOWN;

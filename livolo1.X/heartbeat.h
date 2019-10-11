@@ -11,7 +11,7 @@ uint16_t heartbeat_cycles;
 
 void heartbeat_preinit(void);
 void heartbeat_update(void);
-bit heartbeat_outage(void);
+bit no_50hz(void);
 
 
 #ifdef	__cplusplus

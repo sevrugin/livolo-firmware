@@ -3,15 +3,16 @@
 #include "switch.h"
 #include "config.h"
 #include "util.h"
+#include "heartbeat.h"
 
 /*
  * Private constants
  */
-#define RELAY1_R    RC7 // relay 1 reset (Hongfa HFE60 2-coil latched)
-#define RELAY1_S    RC6 // relay 1 set
+#define RELAY1_RESET    RC7 // relay 1 reset (Hongfa HFE60 2-coil latched)
+#define RELAY1_SET    RC6 // relay 1 set
 
-#define RELAY2_R    RC2 // relay 2 reset
-#define RELAY2_S    RA1 // relay 2 set
+#define RELAY2_RESET    RC2 // relay 2 reset
+#define RELAY2_SET    RA1 // relay 2 set
 
 /*
  * Public vars
@@ -34,8 +35,8 @@ uint8_t switch_status[2];
 void
 switch_preinit()
 {
-    RELAY1_R = RELAY1_S = 0;
-    RELAY2_R = RELAY2_S = 0;
+    RELAY1_RESET = RELAY1_SET = 0;
+    RELAY2_RESET = RELAY2_SET = 0;
     LED1 = LED2 = LED_RED;
     switch_status[0] = switch_status[1] = SWITCH_OFF;
 }
@@ -81,19 +82,23 @@ switch_on(uint8_t n)
     switch_status[n] = SWITCH_ON;
     switch (n) {
         case 1:
-            RELAY2_S = 1;
-            CLK_125KHZ();
-            DELAY_125KHZ(RELAY_OP_TIME);
-            RELAY2_S = 0;
-            CLK_4MHZ();
+            RELAY2_SET = 1;
+            if (RELAY_SWITCH_TYPE == 0 || no_50hz() == 0) { // type or 50hz
+                CLK_125KHZ();
+                DELAY_125KHZ(RELAY_OP_TIME);
+                RELAY2_SET = 0;
+                CLK_4MHZ();
+            }
             LED2 = LED_RED;
             break;
         default: // 0
-            RELAY1_S = 1;
-            CLK_125KHZ();
-            DELAY_125KHZ(RELAY_OP_TIME);
-            RELAY1_S = 0;
-            CLK_4MHZ();
+            RELAY1_SET = 1;
+            if (RELAY_SWITCH_TYPE == 0 || no_50hz() == 0) { // type or 50hz
+                CLK_125KHZ();
+                DELAY_125KHZ(RELAY_OP_TIME);
+                RELAY1_SET = 0;
+                CLK_4MHZ();
+            }
             LED1 = LED_RED;
             break;
     }
@@ -105,19 +110,27 @@ switch_off(uint8_t n)
     switch_status[n] = SWITCH_OFF;
     switch (n) {
         case 1:
-            RELAY2_R = 1;
-            CLK_125KHZ();
-            DELAY_125KHZ(RELAY_OP_TIME);
-            RELAY2_R = 0;
-            CLK_4MHZ();
+            if (RELAY_SWITCH_TYPE == 0 || no_50hz() == 0) { // type or 50hz
+                RELAY2_RESET = 1;
+                CLK_125KHZ();
+                DELAY_125KHZ(RELAY_OP_TIME);
+                RELAY2_RESET = 0;
+                CLK_4MHZ();
+            } else {
+                RELAY2_SET = 0;
+            }
             LED2 = LED_BLUE;
             break;
         default: // 0
-            RELAY1_R = 1;
-            CLK_125KHZ();
-            DELAY_125KHZ(RELAY_OP_TIME);
-            RELAY1_R = 0;
-            CLK_4MHZ();
+            if (RELAY_SWITCH_TYPE == 0 || no_50hz() == 0) { // type or 50hz
+                RELAY1_RESET = 1;
+                CLK_125KHZ();
+                DELAY_125KHZ(RELAY_OP_TIME);
+                RELAY1_RESET = 0;
+                CLK_4MHZ();
+            } else {
+                RELAY1_SET = 0;
+            }
             LED1 = LED_BLUE;
             break;
     }

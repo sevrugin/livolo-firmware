@@ -16,11 +16,18 @@ extern "C" {
 // Constants
 // --------------------------------------------------------------------
 
-//#define TWO_WAY_SWITCH // Enable for two-way switch
+#define TWO_WAY_SWITCH      // Enable for two-way switch
     
-#define NO_SOCKET_MODE     0 // How-to wotk if no 50Hz (0 - push, 1 - toggle)
-    
-// Trip threshold in 1/256 fractions of the average frequency
+#define NO_SOCKET_MODE     1 // How-to wotk if no 50Hz (0 - push, 1 - toggle)
+
+/*
+ * Relay switch type
+ * 0 - (Livolo default) use relay op time to on/off relay (RELAY_SET/RELAY_RESET pins.
+ * 1 - use only RELAY_SET pin to on/off relay
+ */
+#define RELAY_SWITCH_TYPE         1  
+
+    // Trip threshold in 1/256 fractions of the average frequency
 // working (empirical) values: 3 for 3V
 #define TRIP_THRESHOLD      3
 
