@@ -5,10 +5,6 @@
 extern "C" {
 #endif
 
-typedef enum {
-    SOCKET_MODE_PUSH,
-    SOCKET_MODE_TOGGLE
-};
 // --------------------------------------------------------------------
 // Compilation flags
 // --------------------------------------------------------------------
@@ -20,9 +16,9 @@ typedef enum {
 // Constants
 // --------------------------------------------------------------------
 
-#define TWO_TOGGLE_SWITCH      // Enable for two-way switch
+// #define TWO_TOGGLE_SWITCH      // Enable for two-way switch
     
-#define NO_SOCKET_MODE      SOCKET_MODE_PUSH // How-to wotk if no 50Hz
+#define NO_SOCKET_MODE      1 // How-to wotk if no 50Hz
 #define NO_SOCKET_INVERT_MODE  1   // If 1 then OFF=HIGH and ON=LOW voltage
 
 /*
@@ -30,26 +26,26 @@ typedef enum {
  * 0 - (Livolo default) use relay op time to on/off relay (RELAY_SET/RELAY_RESET pins.
  * 1 - use only RELAY_SET pin to on/off relay
  */
-#define RELAY_SWITCH_TYPE         1  
+#define RELAY_SWITCH_TYPE         0  
 
     // Trip threshold in 1/256 fractions of the average frequency
 // working (empirical) values: 3 for 3V
-#define TRIP_THRESHOLD      3
+#define TRIP_THRESHOLD      10
 
 // Release threshold in 1/256 fractions of the average frequency
-#define HYST_THRESHOLD      2
+#define HYST_THRESHOLD      6
 
 // Min sensor trips to actually switch
-#define READS_TO_SWITCH     1
+#define READS_TO_SWITCH     2
 
 // If sensor is not released after RELEASE_TIMEOUT cycles, the last frequency
 // is assumed to be the new condition, eg. if dropped some water on the plate.
-// 180 = ~3s at 16.384 ms per cycle.
-#define RELEASE_TIMEOUT     180
+// 180 = ~3s at 16.384 ms per cycle. 60 = 1sec
+#define RELEASE_TIMEOUT     60 * 60
 
 // Space out averages 1 every AVERAGING_RATE raw values. Should be a power of
 // 2 optimally
-#define AVERAGING_RATE      2
+#define AVERAGING_RATE      5
 
 // Time to shutdown the relays after an outage is detected. In read cycles.
 // Undefine to disable outage detection completely to help debugging.

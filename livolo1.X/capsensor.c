@@ -28,7 +28,7 @@ void interrupt isr()
  */
 
 #define CAPSENSOR_START_INT() \
-    TMR0    = 128; /* Reset T0. Increment will be inhibited for 2 instructions */ \
+    TMR0    = 192; /* Reset T0. Increment will be inhibited for 2 instructions */ \
     T0IF    = 0; /* clear interrupt flag */ \
     T0IE    = 1; /* Enables the Timer0 interrupt */ \
     GIE     = 1; /* Enables all unmasked interrupts */ \
@@ -159,14 +159,14 @@ capsensor_is_button_pressed(uint8_t n)
             cap_frozen_avg[n] = cap_rolling_avg[n];
             cap_cycles[n] = 0;
         }
-    } else {
+    } else { // button is pressed
         if ((int16_t)(cap_raw - cap_frozen_avg[n] / 16) > (int16_t)(HYST_THRESHOLD * (cap_frozen_avg[n] / 16) / 256)) {
             cap_cycles[n]++;
             if (cap_cycles[n] >= RELEASE_TIMEOUT) {
-                //cap_cycles[n] = 0;
+                cap_cycles[n] = 0;
             }
-            if (no_50hz() && (NO_SOCKET_MODE == SOCKET_MODE_PUSH)) {
-                do_switch = 1;
+            if (no_50hz() && (NO_SOCKET_MODE == 0)) {
+                do_switch = 1; // signal should be ON
             }
         } else {
             cap_cycles[n] = 0;
