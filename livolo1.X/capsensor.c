@@ -28,7 +28,7 @@ void interrupt isr()
  */
 
 #define CAPSENSOR_START_INT() \
-    TMR0    = 192; /* Reset T0. Increment will be inhibited for 2 instructions */ \
+    TMR0    = 196; /* Reset T0. Increment will be inhibited for 2 instructions */ \
     T0IF    = 0; /* clear interrupt flag */ \
     T0IE    = 1; /* Enables the Timer0 interrupt */ \
     GIE     = 1; /* Enables all unmasked interrupts */ \
@@ -115,10 +115,10 @@ capsensor_init(uint8_t n)
     // Configure T0 as counter with T0CKI as clock source.
     // The maximum frequency measurable by the pin is 50 MHz, however the
     // maximum period AFTER prescaler must be >4Tosc + 40 ns, at 4 MHz:
-    // T >1040 ns -> f <0.96 MHz, so we should use at least a 1:4 prescaler
+    // T >1040 ns -> f <0.96 MHz, so we should use at least a 1:4 prescaler # http://narodstream.ru/wp-content/uploads/2017/12/pic005img02.png
     // for ~3.0 MHz oscillator freqs.
 
-    OPTION_REG = 0b00000010 | (OPTION_REG & 0b11110000U);
+    OPTION_REG = 0b00000001 | (OPTION_REG & 0b11110000U);
     // dont' care  0000----
     // PSA         ----0---  Prescaler is assigned to the Timer0 module
     // PS2         -----010  1:8 Timer0 rate
@@ -162,10 +162,15 @@ capsensor_is_button_pressed(uint8_t n)
     } else { // button is pressed
         if ((int16_t)(cap_raw - cap_frozen_avg[n] / 16) > (int16_t)(HYST_THRESHOLD * (cap_frozen_avg[n] / 16) / 256)) {
             cap_cycles[n]++;
+//            if (RELAY_SWITCH_TYPE == 1 && cap_cycles[n] == 220) { //10 sec
+//                NO_SOCKET_MODE = NO_SOCKET_MODE? 0: 1;
+//                eeprom_write(0x01, NO_SOCKET_MODE);
+//                printf("Long press: %x\r\n", NO_SOCKET_MODE);
+//            }
             if (cap_cycles[n] >= RELEASE_TIMEOUT) {
                 cap_cycles[n] = 0;
             }
-            if (no_50hz() && (NO_SOCKET_MODE == 0)) {
+            if (no_50hz() && (NO_SOCKET_MODE == SOCKET_MODE_PUSH)) {
                 do_switch = 1; // signal should be ON
             }
         } else {
@@ -177,9 +182,10 @@ capsensor_is_button_pressed(uint8_t n)
     // when the button is tripped make the rolling every cycle in case we need
     // to adapt to the new situation fast (ie water drop)
     avgs++;
-    if (cap_cycles[n] >= READS_TO_SWITCH || (avgs % AVERAGING_RATE == 0)) {
+    if (cap_cycles[n] == 0 && (avgs % AVERAGING_RATE == 0)) {
         cap_rolling_avg[n] = cap_rolling_avg[n] - cap_rolling_avg[n] / 16 + cap_raw;
     }
+    
     
     return do_switch;
 }

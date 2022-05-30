@@ -8,9 +8,10 @@
 #include "heartbeat.h"
 #include "util.h"
 #include "extrigger.h"
+#include "math.h"
 
-
-void main(void) {
+void main(void) 
+{
     // Early inits (before osc is settled)
     switch_preinit();
     heartbeat_preinit();
@@ -93,6 +94,19 @@ void main(void) {
     // WDTPS    ---0101- 1:1024 ~ 68/33/23ms @ 15/31/45 KHz LFINTOSC (min/typ/max)
     // SWDTEN   -------0 WDT is turned off (for now)
 
+    printf("Relay switch type is: ");
+    volatile unsigned char value;// = 0x09;
+    value = eeprom_read(0x01);
+    
+    //printf("first: %x\n", value);
+    if (value == 1) {
+        printf("TOGGLE\r\n");
+    } else {
+        printf("BUTTON\r\n");
+    }
+    printf("NO_SOCKET_MODE: %x\r\n", NO_SOCKET_MODE);
+    
+    
     for (;;) {
 
 #ifdef TIME_TO_SHUTDOWN
@@ -112,14 +126,16 @@ void main(void) {
 #endif
         for (uint8_t i = 0; i < n; i++) {
             if (no_50hz()) { // No 50Hz. Work as Push button
-                if (NO_SOCKET_MODE == 0) { // 0 for push button
+                if (NO_SOCKET_MODE == SOCKET_MODE_PUSH) { 
                     if (capsensor_is_button_pressed(i)) {
                         switch_on(i);
-                    } else { 
+                        printf("pressed\r\n");
+                    } else { // SOCKET_MODE_TOGGLE
                         switch_off(i);
                     }
                 } else if (capsensor_is_button_pressed(i)) { // 1 for toggle button
                     switch_toggle(i);
+                    printf("pressed\r\n");
                 }
             } else {
                 if (capsensor_is_button_pressed(i)) {
@@ -129,13 +145,15 @@ void main(void) {
         }
         
 #ifdef DEBUG
-        printf("%u,%u,%u,%u,%u,%u\r\n", 
+        if (round(cap_rolling_avg[0] / 16) != cap_raw) {
+            printf("ROL: %u, FROZ: %u, RAW: %u, CYCLES: %u,%u,%u\r\n", 
                 cap_rolling_avg[0] / 16, 
                 cap_frozen_avg[0] / 16, 
                 cap_raw,
                 cap_cycles[0],
                 heartbeat_cycles,
                 switch_status[0]);
+        }
 #ifdef TWO_TOGGLE_SWITCH
         printf("%u,%u,%u,%u,%u,%u\r\n", 
                 cap_rolling_avg[1] / 16, 

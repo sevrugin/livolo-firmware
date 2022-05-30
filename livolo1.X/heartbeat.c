@@ -48,8 +48,7 @@ heartbeat_update(void)
 #endif
 }
 
-bit
-no_50hz(void)
+bit no_50hz(void)
 {
 #ifdef TIME_TO_SHUTDOWN
     return heartbeat_cycles > TIME_TO_SHUTDOWN;

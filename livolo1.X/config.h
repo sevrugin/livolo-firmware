@@ -8,6 +8,9 @@ extern "C" {
 // --------------------------------------------------------------------
 // Compilation flags
 // --------------------------------------------------------------------
+#define SOCKET_MODE_PUSH 0
+#define SOCKET_MODE_TOGGLE 1
+
 
 // Enable debug serial out, note this also slows down time between sensor reads
 #define DEBUG
@@ -16,27 +19,27 @@ extern "C" {
 // Constants
 // --------------------------------------------------------------------
 
-// #define TWO_TOGGLE_SWITCH      // Enable for two-way switch
+//#define TWO_TOGGLE_SWITCH      // Enable for two-way switch
     
-#define NO_SOCKET_MODE      1 // How-to wotk if no 50Hz
-#define NO_SOCKET_INVERT_MODE  1   // If 1 then OFF=HIGH and ON=LOW voltage
+#define NO_SOCKET_MODE          SOCKET_MODE_PUSH //SOCKET_MODE_TOGGLE // How-to wotk if no 50Hz
+#define NO_SOCKET_INVERT_MODE   1   // If 1 then OFF=HIGH and ON=LOW voltage
 
 /*
  * Relay switch type
  * 0 - (Livolo default) use relay op time to on/off relay (RELAY_SET/RELAY_RESET pins.
  * 1 - use only RELAY_SET pin to on/off relay
  */
-#define RELAY_SWITCH_TYPE         0  
+#define RELAY_SWITCH_TYPE         1  
 
     // Trip threshold in 1/256 fractions of the average frequency
 // working (empirical) values: 3 for 3V
-#define TRIP_THRESHOLD      10
+#define TRIP_THRESHOLD      9
 
 // Release threshold in 1/256 fractions of the average frequency
-#define HYST_THRESHOLD      6
+#define HYST_THRESHOLD      2
 
 // Min sensor trips to actually switch
-#define READS_TO_SWITCH     2
+#define READS_TO_SWITCH     1
 
 // If sensor is not released after RELEASE_TIMEOUT cycles, the last frequency
 // is assumed to be the new condition, eg. if dropped some water on the plate.

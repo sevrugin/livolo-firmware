@@ -8,11 +8,11 @@
 /*
  * Private constants
  */
-#define RELAY1_RESET    RC7 // relay 1 reset (Hongfa HFE60 2-coil latched)
-#define RELAY1_SET    RC6 // relay 1 set
+#define RELAY1_RESET    RC7 // RC7 relay 1 reset (Hongfa HFE60 2-coil latched)
+#define RELAY1_SET    RC6 // RC6 relay 1 set
 
-#define RELAY2_RESET    RC2 // relay 2 reset
-#define RELAY2_SET    RA1 // relay 2 set
+#define RELAY2_RESET    RC2 // RC2 relay 2 reset
+#define RELAY2_SET    RA1 // RA1 relay 2 set
 
 /*
  * Public vars
@@ -35,31 +35,35 @@ uint8_t switch_status[2];
 void
 switch_preinit()
 {
-    RELAY1_RESET = RELAY1_SET = 0;
-    RELAY2_RESET = RELAY2_SET = 0;
-    LED1 = LED2 = LED_RED;
-    switch_status[0] = switch_status[1] = SWITCH_OFF;
+    switch_off(0);
+    switch_off(1);
+//    RELAY1_RESET = RELAY1_SET = 0;
+//    RELAY2_RESET = RELAY2_SET = 0;
+//    LED1 = LED2 = LED_RED;
+//    switch_status[0] = switch_status[1] = SWITCH_OFF;
 }
 
 void
 switch_init()
 {
-    // Delay until the cap is charged before we can switch for the first time
-    uint16_t t = POWERUP_TIME * 1000UL / 65536;
-    uint8_t pwmt = 0;   // time
-    uint8_t pwmd = 0;   // duty
-    TMR1ON = 0;
-    TMR1 = 0;
-    TMR1ON = 1;
-    while (t) {
-        if (pwmt == pwmd || (pwmt ^ pwmd) == 0xff) LED1 = ~LED1;
-        if (++pwmt == 0) pwmd += POLICE_LIGHTS_FREQ;
-        if (TMR1IF) { 
-            t--;
-            TMR1IF = 0;
-        }
-    }
-    TMR1ON = 0;
+//    if (! no_50hz()) { // if switch is working from 220v
+//        // Delay until the cap is charged before we can switch for the first time
+//        uint16_t t = POWERUP_TIME * 1000UL / 65536;
+//        uint8_t pwmt = 0;   // time
+//        uint8_t pwmd = 0;   // duty
+//        TMR1ON = 0;
+//        TMR1 = 0;
+//        TMR1ON = 1;
+//        while (t) {
+//            if (pwmt == pwmd || (pwmt ^ pwmd) == 0xff) LED1 = ~LED1;
+//            if (++pwmt == 0) pwmd += POLICE_LIGHTS_FREQ;
+//            if (TMR1IF) { 
+//                t--;
+//                TMR1IF = 0;
+//            }
+//        }
+//        TMR1ON = 0;
+//    }
     switch_off(0);
     switch_off(1);
 }
