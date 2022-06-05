@@ -20,17 +20,21 @@ static bit previous_state;
 /*
  * Public vars
  */
-bit extrigger_status;
+uint8_t extrigger_status;
 
 
 /*
  * Public functions
  */
-bit
+uint8_t
 extrigger_read(void)
 {
-    extrigger_status = previous_state;    // use as tmp
-    previous_state = EXT_TRIG;
-    extrigger_status = (extrigger_status && !previous_state);
+//    extrigger_status = previous_state;    // use as tmp
+//    previous_state = EXT_TRIG;
+//    extrigger_status = (extrigger_status && !previous_state);
+//    return extrigger_status;
+    extrigger_status = (uint8_t)EXT_TRIG;
+    
     return extrigger_status;
 }
+

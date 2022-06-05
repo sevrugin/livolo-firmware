@@ -6,6 +6,14 @@
 #include "util.h"
 #include "heartbeat.h"
 
+extern uint8_t switchMode;
+extern uint8_t cfgTripThreshold;
+extern uint8_t cfgHystThreshold;
+
+short readCap = 0;
+uint16_t x; // todo: error when delete this row
+long unsigned int microseconds = 0;
+
 /*
  * ISR
  */
@@ -19,19 +27,28 @@ void interrupt isr()
         }
     }
 #endif
-    TMR1ON = 0;
+    //TMR1ON = 0;
     T0IF = 0;
+    if (readCap > 0) {
+        readCap--;
+    } 
+    microseconds++;
 }
 
+long unsigned int micro()
+{
+    return microseconds;
+}
 /*
  * Private macros (needs XC8 optimization for speed on to be inlined)
  */
 
 #define CAPSENSOR_START_INT() \
-    TMR0    = 196; /* Reset T0. Increment will be inhibited for 2 instructions */ \
-    T0IF    = 0; /* clear interrupt flag */ \
-    T0IE    = 1; /* Enables the Timer0 interrupt */ \
-    GIE     = 1; /* Enables all unmasked interrupts */ \
+    readCap = 10; /* ms */ \
+/*    TMR0    = 196; /* Reset T0. Increment will be inhibited for 2 instructions */ \
+/*    T0IF    = 0; /* clear interrupt flag */ \
+/*    T0IE    = 1; /* Enables the Timer0 interrupt */ \
+/*    GIE     = 1; /* Enables all unmasked interrupts */ \
     C1VREN  = 1; /* CVREF circuit powered on and routed to C1VREF input of Comparator C1 */ \
     C1ON    = 1; /* Comparator C1 is enabled */ \
     C2ON    = 1; /* Comparator C2 is enabled */ \
@@ -40,12 +57,12 @@ void interrupt isr()
 
 
 #define CAPSENSOR_WAIT_T0_OVERFLOW_INT() \
-    while (TMR1ON) ; /* The ISR will stop T1, so poll this */ \
+    while (TMR1ON && readCap > 0) ; /* The ISR will stop T1, so poll this */ \
     C1ON    = 0; /* Comparator C1 is disabled */ \
     C2ON    = 0; /* Comparator C2 is disabled */ \
     C1VREN  = 0; /* 0.6 Volt constant reference routed to C1VREF input of Comparator C2 */ \
-    T0IE    = 0; /* Disables the Timer0 interrupt */ \
-    GIE     = 0; /* Disables all interrupts */
+/*    T0IE    = 0; /* Disables the Timer0 interrupt */ \
+/*    GIE     = 0; /* Disables all interrupts */
 
 
 /*
@@ -56,28 +73,36 @@ static uint8_t avgs = 0;
 /*
  * Public vars (for debugging from main)
  */
-uint16_t cap_raw;
+uint16_t cap_raw[2];
 uint16_t cap_rolling_avg[2] = {0,0}; // fixed point 12.4
 uint16_t cap_frozen_avg[2] = {0,0}; // fixed point 12.4
 uint8_t cap_cycles[2] = {0,0};
-#ifndef TWO_TOGGLE_SWITCH
-    uint8_t CM1[2] = {0b00010111, };
-    uint8_t CM2[2] = {0b00100111, };
-#else
-    uint8_t CM1[2] = {0b00010101, 0b00010111};
-    uint8_t CM2[2] = {0b00100101, 0b00100111};
-#endif
 
+uint8_t CM1(uint8_t n)
+{
+    if (CFG_TWO_BTN_SWITCH() == 0) {
+        return n == 0? 0b00010111: 0b00000000;
+    } else {
+        return n == 0? 0b00010101: 0b00010111;
+    }
+}
+uint8_t CM2(uint8_t n)
+{
+    if (CFG_TWO_BTN_SWITCH() == 0) {
+        return n == 0? 0b00100111: 0b00000000;
+    } else {
+        return n == 0? 0b00100101: 0b00100111;
+    }
+}
 /*
  * Public functions
  */
-
 void
 capsensor_init(uint8_t n) 
 {
     // Configure C1 and C2 as a relaxation oscillator
     // See Microchip AN1101
-    CM1CON0 = CM1[n]; 
+    CM1CON0 = CM1(n); 
     // C1ON     0------- disable (-> C1OUT=0) to save power
     // C1OUT    -r------ r/o
     // C1OE     --0----- no output on pin
@@ -86,7 +111,7 @@ capsensor_init(uint8_t n)
     // C1R      -----1-- C1Vin+ = C1Vref
     // C1CH     ------11 C1Vin- = C12IN3-
     
-    CM2CON0 = CM2[n];
+    CM2CON0 = CM2(n);
     // C2ON     0------- disable (-> C2OUT=0) to save power
     // C2OUT    -r------ r/o
     // C2OE     --1----- connected to pin
@@ -123,8 +148,14 @@ capsensor_init(uint8_t n)
     // PSA         ----0---  Prescaler is assigned to the Timer0 module
     // PS2         -----010  1:8 Timer0 rate
     
+    TMR0    = 0; /* Reset T0. Increment will be inhibited for 2 instructions */ 
+    T0IF    = 0; /* clear interrupt flag */ 
+    T0IE    = 1; /* Enables the Timer0 interrupt */ 
+    GIE     = 1; /* Enables all unmasked interrupts */ 
+
+    
     // Init rolling average
-    cap_rolling_avg[n] = 0;
+    uint32_t value = 0;
     for (int8_t i = 0; i < 16; i++) {
         CAPSENSOR_START_INT();
         CAPSENSOR_WAIT_T0_OVERFLOW_INT();
@@ -132,25 +163,27 @@ capsensor_init(uint8_t n)
         // The value in TMR1 is the time (us) elapsed time after 256*8 periods
         // of the relaxation oscillator, thus its frequency is:
         // F = 256*8 / TMR1 MHz
-        cap_rolling_avg[n] += TMR1;
+        value += TMR1;
     }
+    cap_rolling_avg[n] = value / 16;
 }
-
 
 bit
 capsensor_is_button_pressed(uint8_t n)
 {
     uint8_t do_switch = 0;
     
-    CM1CON0 = CM1[n]; 
-    CM2CON0 = CM2[n];
+    CM1CON0 = CM1(n); 
+    CM2CON0 = CM2(n);
     
     CAPSENSOR_START_INT();
     CAPSENSOR_WAIT_T0_OVERFLOW_INT();
-    cap_raw = TMR1;
+    cap_raw[n] = TMR1;
     
     if (cap_cycles[n] < READS_TO_SWITCH) {
-        if ((int16_t)(cap_raw - cap_rolling_avg[n] / 16) > (int16_t)(TRIP_THRESHOLD * (cap_rolling_avg[n] / 16) / 256)) {
+        // 88 - 85 > 3 * 85 / 256
+        // 3 > 9 * 0.3 (2.7)
+        if ((int16_t)(cap_raw[n] - cap_rolling_avg[n]) > (int16_t)(cap_rolling_avg[n] / 256 * cfgTripThreshold)) {
             cap_cycles[n]++;
             if (cap_cycles[n] >= READS_TO_SWITCH) {
                 do_switch = 1;
@@ -160,17 +193,17 @@ capsensor_is_button_pressed(uint8_t n)
             cap_cycles[n] = 0;
         }
     } else { // button is pressed
-        if ((int16_t)(cap_raw - cap_frozen_avg[n] / 16) > (int16_t)(HYST_THRESHOLD * (cap_frozen_avg[n] / 16) / 256)) {
+        if ((int16_t)(cap_raw[n] - cap_frozen_avg[n]) > (int16_t)(cap_frozen_avg[n] / 256 * cfgHystThreshold)) {
             cap_cycles[n]++;
-//            if (RELAY_SWITCH_TYPE == 1 && cap_cycles[n] == 220) { //10 sec
+            if (RELAY_SWITCH_TYPE == 1 && cap_cycles[n] == 220) { //10 sec
 //                NO_SOCKET_MODE = NO_SOCKET_MODE? 0: 1;
 //                eeprom_write(0x01, NO_SOCKET_MODE);
-//                printf("Long press: %x\r\n", NO_SOCKET_MODE);
-//            }
+                //printf("Long press: %x\r\n", NO_SOCKET_MODE);
+            }
             if (cap_cycles[n] >= RELEASE_TIMEOUT) {
                 cap_cycles[n] = 0;
             }
-            if (no_50hz() && (NO_SOCKET_MODE == SOCKET_MODE_PUSH)) {
+            if (CFG_BTN_TYPE() == 0) {
                 do_switch = 1; // signal should be ON
             }
         } else {
@@ -183,7 +216,7 @@ capsensor_is_button_pressed(uint8_t n)
     // to adapt to the new situation fast (ie water drop)
     avgs++;
     if (cap_cycles[n] == 0 && (avgs % AVERAGING_RATE == 0)) {
-        cap_rolling_avg[n] = cap_rolling_avg[n] - cap_rolling_avg[n] / 16 + cap_raw;
+        cap_rolling_avg[n] = (cap_rolling_avg[n] * 15 + cap_raw[n]) / 16;
     }
     
     

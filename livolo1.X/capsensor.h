@@ -8,7 +8,7 @@
 extern "C" {
 #endif
     
-uint16_t cap_raw;
+uint16_t cap_raw[2];
 uint16_t cap_rolling_avg[2];
 uint16_t cap_frozen_avg[2];
 uint8_t cap_cycles[2];
@@ -19,7 +19,7 @@ uint8_t cap_cycles[2];
  */    
 void capsensor_init(uint8_t n);
 bit capsensor_is_button_pressed(uint8_t n);
-
+long unsigned int micro();
 
 #ifdef	__cplusplus
 }

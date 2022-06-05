@@ -12,9 +12,13 @@
 extern "C" {
 #endif
 
-bit extrigger_status;
+#define EXT_ON   0
+#define EXT_OFF  1
+    
+uint8_t extrigger_status;
 
-bit extrigger_read(void);
+uint8_t extrigger_read(void);
+
 
 
 #ifdef	__cplusplus

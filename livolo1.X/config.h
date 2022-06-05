@@ -13,17 +13,22 @@ extern "C" {
 
 
 // Enable debug serial out, note this also slows down time between sensor reads
-#define DEBUG
-
+//#define DEBUG
+    
 // --------------------------------------------------------------------
 // Constants
 // --------------------------------------------------------------------
 
-//#define TWO_TOGGLE_SWITCH      // Enable for two-way switch
+#define CFG_BTN_TYPE() (switchMode & (1 << 0)? 1: 0)
     
-#define NO_SOCKET_MODE          SOCKET_MODE_PUSH //SOCKET_MODE_TOGGLE // How-to wotk if no 50Hz
-#define NO_SOCKET_INVERT_MODE   1   // If 1 then OFF=HIGH and ON=LOW voltage
+#define CFG_ON_STATE() (switchMode & (1 << 1)? 1: 0)
+#define CFG_OFF_STATE() (switchMode & (1 << 1)? 0: 1)
+    
+#define CFG_OUT_TYPE() (switchMode & (1 << 2)? 1: 0)
+    
+#define CFG_TWO_BTN_SWITCH() (switchMode & (1 << 3)? 1: 0)
 
+    
 /*
  * Relay switch type
  * 0 - (Livolo default) use relay op time to on/off relay (RELAY_SET/RELAY_RESET pins.
@@ -33,10 +38,12 @@ extern "C" {
 
     // Trip threshold in 1/256 fractions of the average frequency
 // working (empirical) values: 3 for 3V
-#define TRIP_THRESHOLD      9
+//#define TRIP_THRESHOLD      20
+    //switched to "cfgTripThreshold"
 
 // Release threshold in 1/256 fractions of the average frequency
-#define HYST_THRESHOLD      2
+//#define HYST_THRESHOLD      5
+    //switched to "cfgHystThreshold"
 
 // Min sensor trips to actually switch
 #define READS_TO_SWITCH     1
