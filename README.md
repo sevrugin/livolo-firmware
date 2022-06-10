@@ -16,6 +16,16 @@ In my ideal world the switch should:
 4. Be able to work with ONW/TWO button switches
 5. Be configurable
 
+## Supported boards
+
+ * [VL-C701X-2](https://www.aliexpress.com/item/Free-Shipping-Livolo-Luxury-White-Crystal-Glass-Switch-Panel-EU-Standard-VL-C701-11-110-250V/512886492.html) VER: C0 (1-gang, 1-way, no RF, EU version)
+
+Should be easy to work with this, too:
+
+ * [VL-C702X-2](https://www.aliexpress.com/item/Free-Shipping-White-Crystal-Glass-Switch-Panel-EU-Standard-VL-C702-11-Livolo-AC-110-250V/512770913.html) VER: C1 (2-gang, 1-way, no RF, EU version)
+
+Note that there is no guarantee that buying from these links will get you those versions since they seem to change designs often.
+
 ## Demo
 
 This is how to the switch works on PUSH/STATE modes. 
@@ -99,16 +109,6 @@ I highly recommend to `REBOOT` the switch after any modification of configuratio
 ## Pull requests welcome 
 
 This is work in progress. I plan to use this and I don't want to set my house on fire, so either if you want to study how the switch works internally or fork it to further work on it, I'd love to hear from suggestions or improvements!
-
-## Supported boards:
-
- * [VL-C701X-2](https://www.aliexpress.com/item/Free-Shipping-Livolo-Luxury-White-Crystal-Glass-Switch-Panel-EU-Standard-VL-C701-11-110-250V/512886492.html) VER: C0 (1-gang, 1-way, no RF, EU version)
-
-Should be easy to work with this, too:
-
- * [VL-C702X-2](https://www.aliexpress.com/item/Free-Shipping-White-Crystal-Glass-Switch-Panel-EU-Standard-VL-C702-11-Livolo-AC-110-250V/512770913.html) VER: C1 (2-gang, 1-way, no RF, EU version)
-
-Note that there is no guarantee that buying from these links will get you those versions since they seem to change designs often.
 
 ## Working principle
 
