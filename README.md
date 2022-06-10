@@ -1,6 +1,6 @@
 # Firmware for Livolo light switches
 
-BIG thank you the original repository!!! https://github.com/jamarju/livolo-firmware
+HUGE thanks to the original repository!!! https://github.com/jamarju/livolo-firmware
 This is the fork.
 
 Livolo sensor board is based on **PIC16F690**(C0/C1 revision) microchip or **PIC16lF1559**(D0/D1 revision marked as `5VL599006  LIVOLO 1947725` which not supported at this time)
