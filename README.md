@@ -16,7 +16,7 @@ In my ideal world the switch should:
 4. Be able to work with ONW/TWO button switches
 5. Be configurable
 
-#Demo
+## Demo
 
 This is how to the switch works on PUSH/STATE modes. 
 
@@ -25,24 +25,24 @@ Switch connected to 12v supply and using LEDs as output demonstration (you can t
 [![Livolo control video](https://i9.ytimg.com/vi/Xp0Ba5l0h7c/mq2.jpg?sqp=CID0i5UG&rs=AOn4CLCO5fgaO9oXm9slgYmzUaaqMRKHIQ)](https://youtu.be/Xp0Ba5l0h7c)
 [![Livolo control video](https://i9.ytimg.com/vi/i4VSr7Syjqk/mq2.jpg?sqp=CID0i5UG&rs=AOn4CLAtvMt8t85b4vcV3bc63mrPrDOtPw)](https://youtu.be/i4VSr7Syjqk)
  
-##Schematic
+## Schematic
 
 This is the switch board pinout schematic
 
 <img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/C701X.png?raw=true" width="400" alt="">
 
 
-##Wiring
+## Wiring
 
 To use the switch bypass 220v you can connect it to 12v power supply:
 
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-05.jpg?raw=true" width="400" alt="">
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-10.jpg?raw=true" width="400" alt="">
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-14.jpg?raw=true" width="400" alt="">
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-19.jpg?raw=true" width="400" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-05.jpg?raw=true" width="350" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-10.jpg?raw=true" width="350" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-14.jpg?raw=true" width="350" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-19.jpg?raw=true" width="350" alt="">
 
 
-##Configuring
+## Configuring
 
 The Firmware stores his own configuration into EEPROM and might be changed by EXTERNAL button connected between EXT and GND contacts.
 
@@ -88,7 +88,7 @@ When entering the `DEBUG` mode, `raw` data from the sensors is displayed.
 
 I highly recommend to `REBOOT` the switch after any modification of configuration data 
 
-##Additional files
+## Additional files
 
 <img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/livolo-circuit.png?raw=true" width="400" alt="">
 
