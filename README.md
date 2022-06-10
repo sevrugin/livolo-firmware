@@ -1,46 +1,100 @@
 # Firmware for Livolo light switches
 
-Livolo sensor board is based on PIC16F690 microchip or PIC16lF1559 in D1 revision (marked as `5VL599006  LIVOLO 1947725`, not supported at this time)
+BIG thank you the original repository!!! https://github.com/jamarju/livolo-firmware
+This is the fork.
 
-My goal was to make new firmware to use it for smart house.
+Livolo sensor board is based on **PIC16F690**(C0/C1 revision) microchip or **PIC16lF1559**(D0/D1 revision marked as `5VL599006  LIVOLO 1947725` which not supported at this time)
 
-Firmware should:
+My goal was to make a new firmware to use it for smart home.
+
+I'm using it to operate another relay into my electrical shield.
+
+In my ideal world the switch should:
 1. Be able to work as `PUSH` button or as `STATE` button
 2. Be able to switch between `HI/LO` output modes
-3. Be able to work with default relay (pulse signal to SET pin to switch ON relay, pulse signal to RES pin to switch OFF relay), or just toggle SET pin to HI/LO
-4. Be able to work with one/two button switches
+3. Be able to work with onboard relay (pulse signal to SET pin to switch ON relay, pulse signal to RES pin to switch OFF relay), or just toggle SET pin to HI/LO (to use it just as a signal wire)
+4. Be able to work with ONW/TWO button switches
 5. Be configurable
 
 #Demo
 
-This is how to switch works in PUSH/STATE modes. 
+This is how to the switch works on PUSH/STATE modes. 
 
-Switch connected to 12v supply adn using LED as output demonstration
+Switch connected to 12v supply and using LEDs as output demonstration (you can toggle the output state for ON/OFF mode by configurations)  
 
 [![Livolo control video](https://i9.ytimg.com/vi/Xp0Ba5l0h7c/mq2.jpg?sqp=CID0i5UG&rs=AOn4CLCO5fgaO9oXm9slgYmzUaaqMRKHIQ)](https://youtu.be/Xp0Ba5l0h7c)
 [![Livolo control video](https://i9.ytimg.com/vi/i4VSr7Syjqk/mq2.jpg?sqp=CID0i5UG&rs=AOn4CLAtvMt8t85b4vcV3bc63mrPrDOtPw)](https://youtu.be/i4VSr7Syjqk)
  
 ##Schematic
 
-This is the switch board schematic
+This is the switch board pinout schematic
 
-![schematic](img/C701X.png){:width="200px"}
-
-
-========
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/C701X.png?raw=true" width="400" alt="">
 
 
-[![Livolo control video](http://img.youtube.com/vi/t0wluQbNzUw/0.jpg)](http://www.youtube.com/watch?v=t0wluQbNzUw)
+##Wiring
 
-I wanted to add on/off feedback and wired remote control to a Livolo switch. Their _brain_ is a PIC16F690, but unfortunately the chip comes code protected, so I had to write this firmware from scratch.
+To use the switch bypass 220v you can connect it to 12v power supply:
 
-## Features:
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-05.jpg?raw=true" width="400" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-10.jpg?raw=true" width="400" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-14.jpg?raw=true" width="400" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-19.jpg?raw=true" width="400" alt="">
 
- * Serial communication.
- * On/off feedback via UART
- * Remote control via UART
- * 2 wires (TX/RX + GND) for simplex, 3 wires (TX, RX, GND) for duplex comms.
- * Easy to modify: all the extra wires can be soldered to the empty RF through-hole header J6.
+
+##Configuring
+
+The Firmware stores his own configuration into EEPROM and might be changed by EXTERNAL button connected between EXT and GND contacts.
+
+I highly recommend connecting the switch by UART to see the configuration menu
+`screen /dev/ttyUSB0 57600`
+
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-24-35.jpg?raw=true" width="400" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-01.jpg?raw=true" width="400" alt="">
+
+Clicking the external button you will be able to switch between the next menu options:
+```
+VERSION                     v1.0.0
+1.BUTTON PRESS TYPE:        STATE/PUSH
+2.OUT PIN STATE WHEN ON:    HIGH/LOW
+3.OUT PIN LOGIC:            LIVOLO/SET_PIN
+4.SWITCH BUTTONS COUNT:     TWO/ONE
+5.TRIP THRESHOLD:           20
+6.RELEASE THRESHOLD:        5
+DEBUG:                      OFF/ON
+REBOOT
+```
+
+To enter into `edit mode` long press the EXT button and you see an additional `[E]` symbol
+
+```
+1.BUTTON PRESS TYPE:        STATE [E]
+```
+
+to change the option short click the EXT button
+```
+1.BUTTON PRESS TYPE:        PUSH [E]
+```
+
+long click the EXT button to exit from `edit mode` 
+
+_Note_: The RED led on sensor panel blinks N times (menu number) when you switch between menus. When you enter into edit mode it glows RED.
+
+## Debug
+
+When entering the `DEBUG` mode, `raw` data from the sensors is displayed.
+
+## Reset
+
+I highly recommend to `REBOOT` the switch after any modification of configuration data 
+
+##Additional files
+
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/livolo-circuit.png?raw=true" width="400" alt="">
+
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/livolo-serial.png?raw=true" width="400" alt="">
+
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/touch-circuit.png?raw=true" width="400" alt="">
 
 ## Pull requests welcome 
 
@@ -75,6 +129,8 @@ Because of this, I recommend replacing the PIC with a blank one. This way you st
 You need MPLAB X IDE + XC8 compiler. Load up the project, compile and flash.
 
 `config.h` contains a few flags that can be finetuned, ie. the trip and release threshold values.
+
+**Important**! Set in project configuration Pack: PIC16Fxxx_DFP = 1.0.9 AND XC8 = 1.45
 
 ## Serial connection
 
