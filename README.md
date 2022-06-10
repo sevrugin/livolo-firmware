@@ -1,5 +1,35 @@
 # Firmware for Livolo light switches
 
+Livolo sensor board is based on PIC16F690 microchip or PIC16lF1559 in D1 revision (marked as `5VL599006  LIVOLO 1947725`, not supported at this time)
+
+My goal was to make new firmware to use it for smart house.
+
+Firmware should:
+1. Be able to work as `PUSH` button or as `STATE` button
+2. Be able to switch between `HI/LO` output modes
+3. Be able to work with default relay (pulse signal to SET pin to switch ON relay, pulse signal to RES pin to switch OFF relay), or just toggle SET pin to HI/LO
+4. Be able to work with one/two button switches
+5. Be configurable
+
+#Demo
+
+This is how to switch works in PUSH/STATE modes. 
+
+Switch connected to 12v supply adn using LED as output demonstration
+
+[![Livolo control video](https://i9.ytimg.com/vi/Xp0Ba5l0h7c/mq2.jpg?sqp=CID0i5UG&rs=AOn4CLCO5fgaO9oXm9slgYmzUaaqMRKHIQ)](https://youtu.be/Xp0Ba5l0h7c)
+[![Livolo control video](https://i9.ytimg.com/vi/i4VSr7Syjqk/mq2.jpg?sqp=CID0i5UG&rs=AOn4CLAtvMt8t85b4vcV3bc63mrPrDOtPw)](https://youtu.be/i4VSr7Syjqk)
+ 
+##Schematic
+
+This is the switch board schematic
+
+![schematic](img/C701X.png){:width="200px"}
+
+
+========
+
+
 [![Livolo control video](http://img.youtube.com/vi/t0wluQbNzUw/0.jpg)](http://www.youtube.com/watch?v=t0wluQbNzUw)
 
 I wanted to add on/off feedback and wired remote control to a Livolo switch. Their _brain_ is a PIC16F690, but unfortunately the chip comes code protected, so I had to write this firmware from scratch.

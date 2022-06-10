@@ -10,7 +10,7 @@
 #include "extrigger.h"
 #include "math.h"
 
-__EEPROM_DATA(0x00, 0b00000000, 20, 5, 0x00, 0x00, 0x00, 0x00); // Fill first 8 bytes of EEPROM
+__EEPROM_DATA(0x00, 0b00000010, 20, 5, 0x00, 0x00, 0x00, 0x00); // Fill first 8 bytes of EEPROM
 
 #define VERSION "1.0.0"
 
@@ -21,10 +21,11 @@ __EEPROM_DATA(0x00, 0b00000000, 20, 5, 0x00, 0x00, 0x00, 0x00); // Fill first 8 
  * 3 (out type)  | 0(only SET pin 1/0), 1(Livolo type SET/RESET pin)
  */
 uint8_t switchMode = 0b00000000; // re-initiated in main())
-/*                          0b00000000 - default
- *                                   0 - 1 btn type (press, state)
- *                                  0  - 2 ON state (low/high)
- *                                 0   - 3 out type (only SET, Livolo type)
+/*                   0b00000000 - default
+ *                            0 - 1 btn type (press, state)
+ *                           0  - 2 ON state (low/high)
+ *                          0   - 3 out type (only SET, Livolo type)
+ *                         0    - 4 switch has 2 buttons
  */
 uint8_t cfgTripThreshold;
 uint8_t cfgHystThreshold;
@@ -65,12 +66,18 @@ void show_uart_config()
                     if (ext_menu > 8) {
                         ext_menu = 1;
                     }
+                    LED1 = LED_BLUE;
+                    blink(ext_menu);
                 }
             }
             if (ext_click_type == 2) {
                 if (ext_in_edit == 0x00) {
+                    LED1 = LED_RED;
+                    
                     ext_in_edit = 0x01;
                 } else {
+                    LED1 = LED_BLUE;
+                    
                     ext_in_edit = 0x00;
                     eeprom_write(0x01, switchMode);
                     eeprom_write(0x02, cfgTripThreshold);
@@ -84,6 +91,9 @@ void show_uart_config()
                 }
             }
 
+            if (ext_in_edit == 0x01 && ext_click_type == 1){
+                blink(1);
+            }
             switch (ext_menu) {
                 case 1:
                     if (ext_in_edit == 0x01 && ext_click_type == 1){

@@ -14,6 +14,21 @@ short readCap = 0;
 uint16_t x; // todo: error when delete this row
 long unsigned int microseconds = 0;
 
+#define BLINK_MS  100
+
+uint8_t blinkCount = 0;
+uint16_t blinkTimer = 0;
+
+void blink(uint8_t count)
+{   
+    LED1 = ! LED1; // revert state for beginning
+    if (count == 0) {
+        return;
+    }
+    blinkCount = count * 2;
+    blinkTimer = BLINK_MS;
+}
+
 /*
  * ISR
  */
@@ -33,6 +48,17 @@ void interrupt isr()
         readCap--;
     } 
     microseconds++;
+    
+    if (blinkCount > 0) {
+        blinkTimer--;
+        if (blinkTimer <= 0) {
+            blinkCount--;
+            if (blinkCount > 0) {
+                LED1 = ! LED1;
+                blinkTimer = BLINK_MS;
+            }
+        }
+    }
 }
 
 long unsigned int micro()

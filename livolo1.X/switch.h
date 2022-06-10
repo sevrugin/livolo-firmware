@@ -14,6 +14,8 @@ extern "C" {
 
 uint8_t switch_status[2];
 
+void blink(uint8_t count);
+
 void switch_preinit();
 void switch_init();
 void switch_toggle(uint8_t n);

@@ -88,17 +88,16 @@ switch_on(uint8_t n)
     switch_status[n] = SWITCH_ON;
     switch (n) {
         case 1:
-//            if (no_50hz()) {
-//                RELAY2_SET = CFG_ON_STATE();
-//            } else {
-//                RELAY2_SET = 1;
-//            }
-//            if (RELAY_SWITCH_TYPE == 0 || no_50hz() == 0) { // type or 50hz
-//                CLK_125KHZ();
-//                DELAY_125KHZ(RELAY_OP_TIME);
-//                RELAY2_SET = 0;
-//                CLK_4MHZ();
-//            }
+            if (CFG_OUT_TYPE() == 1) { // livolo type
+                RELAY2_SET = 1;
+                CLK_125KHZ();
+                DELAY_125KHZ(RELAY_OP_TIME);
+                RELAY2_SET = 0;
+                CLK_4MHZ();
+            } else {
+                RELAY2_SET = CFG_ON_STATE();
+                RELAY2_RESET = 0;
+            }
             LED2 = LED_RED;
             break;
         default: // 0
@@ -112,19 +111,6 @@ switch_on(uint8_t n)
                 RELAY1_SET = CFG_ON_STATE();
                 RELAY1_RESET = 0;
             }
-            
-//            if (no_50hz()) {
-//                RELAY1_SET = CFG_OFF_STATE();
-//            } else {
-//                RELAY1_SET = 1;
-//            }
-//
-//            if (RELAY_SWITCH_TYPE == 0 || no_50hz() == 0) { // type or 50hz
-//                CLK_125KHZ();
-//                DELAY_125KHZ(RELAY_OP_TIME);
-//                RELAY1_SET = 0;
-//                CLK_4MHZ();
-//            }
             LED1 = LED_RED;
             break;
     }
@@ -136,6 +122,16 @@ switch_off(uint8_t n)
     switch_status[n] = SWITCH_OFF;
     switch (n) {
         case 1:
+            if (CFG_OUT_TYPE() == 1) { // livolo type
+                RELAY2_RESET = 1;
+                CLK_125KHZ();
+                DELAY_125KHZ(RELAY_OP_TIME);
+                RELAY2_RESET = 0;
+                CLK_4MHZ();
+            } else {
+                RELAY2_SET = CFG_OFF_STATE();
+                RELAY2_RESET = 0;
+            }
             LED2 = LED_BLUE;
             break;
         default: // 0
