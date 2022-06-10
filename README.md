@@ -29,17 +29,17 @@ Switch connected to 12v supply and using LEDs as output demonstration (you can t
 
 This is the switch board pinout schematic
 
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/C701X.png?raw=true" width="400" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/C701X.png?raw=true" width="500" alt="">
 
 
 ## Wiring
 
 To use the switch bypass 220v you can connect it to 12v power supply:
 
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-05.jpg?raw=true" width="300" alt="">
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-10.jpg?raw=true" width="300" alt="">
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-14.jpg?raw=true" width="300" alt="">
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-19.jpg?raw=true" width="300" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-05.jpg?raw=true" width="500" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-10.jpg?raw=true" width="500" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-14.jpg?raw=true" width="500" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-19.jpg?raw=true" width="500" alt="">
 
 
 ## Configuring
@@ -49,8 +49,8 @@ The Firmware stores his own configuration into EEPROM and might be changed by EX
 I highly recommend connecting the switch by UART to see the configuration menu
 `screen /dev/ttyUSB0 57600`
 
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-24-35.jpg?raw=true" width="400" alt="">
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-01.jpg?raw=true" width="400" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-24-35.jpg?raw=true" width="500" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-01.jpg?raw=true" width="500" alt="">
 
 Clicking the external button you will be able to switch between the next menu options:
 ```
@@ -90,11 +90,11 @@ I highly recommend to `REBOOT` the switch after any modification of configuratio
 
 ## Additional files
 
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/livolo-circuit.png?raw=true" width="400" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/livolo-circuit.png?raw=true" width="500" alt="">
 
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/livolo-serial.png?raw=true" width="400" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/livolo-serial.png?raw=true" width="500" alt="">
 
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/touch-circuit.png?raw=true" width="400" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/touch-circuit.png?raw=true" width="500" alt="">
 
 ## Pull requests welcome 
 
