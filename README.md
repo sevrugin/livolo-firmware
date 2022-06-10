@@ -36,10 +36,10 @@ This is the switch board pinout schematic
 
 To use the switch bypass 220v you can connect it to 12v power supply:
 
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-05.jpg?raw=true" width="350" alt="">
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-10.jpg?raw=true" width="350" alt="">
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-14.jpg?raw=true" width="350" alt="">
-<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-19.jpg?raw=true" width="350" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-05.jpg?raw=true" width="300" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-10.jpg?raw=true" width="300" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-14.jpg?raw=true" width="300" alt="">
+<img src="https://github.com/sevrugin/livolo-firmware/blob/master/img/photo_2022-06-10_10-25-19.jpg?raw=true" width="300" alt="">
 
 
 ## Configuring
