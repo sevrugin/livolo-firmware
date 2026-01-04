@@ -46,16 +46,16 @@ extern "C" {
     //switched to "cfgHystThreshold"
 
 // Min sensor trips to actually switch
-#define READS_TO_SWITCH     1
+#define READS_TO_SWITCH     2
 
 // If sensor is not released after RELEASE_TIMEOUT cycles, the last frequency
 // is assumed to be the new condition, eg. if dropped some water on the plate.
-// 180 = ~3s at 16.384 ms per cycle. 60 = 1sec
-#define RELEASE_TIMEOUT     60 * 60
+// 180 = ~3s at 16.384 ms per cycle. 40 = 1sec
+#define RELEASE_TIMEOUT     10 * 40
 
 // Space out averages 1 every AVERAGING_RATE raw values. Should be a power of
 // 2 optimally
-#define AVERAGING_RATE      5
+#define AVERAGING_RATE      2
 
 // Time to shutdown the relays after an outage is detected. In read cycles.
 // Undefine to disable outage detection completely to help debugging.
@@ -64,6 +64,9 @@ extern "C" {
 // Relay operation time (ms), must be >recommended max spec (10 ms), see
 // Hongfa HFE60 datasheet.
 #define RELAY_OP_TIME       15
+    
+// minimum time in ON/OFF position to be able to read data
+#define SWITCH_OP_DELAY     150
 
 // Power up delay: time to charge the cap before the relays can switch for
 // the first time. In ms.

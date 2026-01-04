@@ -10,9 +10,9 @@
 #include "extrigger.h"
 #include "math.h"
 
-__EEPROM_DATA(0x00, 0b00000010, 20, 5, 0x00, 0x00, 0x00, 0x00); // Fill first 8 bytes of EEPROM
+__EEPROM_DATA(0x00, 0b00000000, 4, 2, 0x00, 0x00, 0x00, 0x00); // Fill first 8 bytes of EEPROM
 
-#define VERSION "1.0.0"
+#define VERSION "1.2.0"
 
 /*
  * red blink     | blue blink

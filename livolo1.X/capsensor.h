@@ -11,7 +11,7 @@ extern "C" {
 uint16_t cap_raw[2];
 uint16_t cap_rolling_avg[2];
 uint16_t cap_frozen_avg[2];
-uint8_t cap_cycles[2];
+uint16_t cap_cycles[2];
 
 
 /*

@@ -21,6 +21,7 @@ extern uint8_t switchMode;
  */
 
 uint8_t switch_status[2];
+uint8_t relay_status[2] = {0, 0};
 
 /*
  * Public functions
@@ -95,8 +96,23 @@ switch_on(uint8_t n)
                 RELAY2_SET = 0;
                 CLK_4MHZ();
             } else {
+                if (RELAY2_SET == 0) {
+                    RELAY2_RESET = ! RELAY2_RESET;
+                    if (RELAY2_RESET == 1) {
+                        CLK_125KHZ();
+                        DELAY_125KHZ(RELAY_OP_TIME);
+                        CLK_4MHZ();
+                    }
+                }
+                if (RELAY2_SET == 1) {
+                    RELAY2_RESET = ! RELAY2_RESET;
+                    if (RELAY2_RESET == 0) {
+                        CLK_125KHZ();
+                        DELAY_125KHZ(RELAY_OP_TIME);
+                        CLK_4MHZ();
+                    }
+                }
                 RELAY2_SET = CFG_ON_STATE();
-                RELAY2_RESET = 0;
             }
             LED2 = LED_RED;
             break;
@@ -108,8 +124,15 @@ switch_on(uint8_t n)
                 RELAY1_SET = 0;
                 CLK_4MHZ();
             } else {
+                CLK_125KHZ();
+                RELAY1_RESET = ! RELAY1_RESET;
+                if (RELAY1_RESET != RELAY1_SET) {
+                    DELAY_125KHZ(RELAY_OP_TIME);
+                }
+
                 RELAY1_SET = CFG_ON_STATE();
-                RELAY1_RESET = 0;
+                DELAY_125KHZ(SWITCH_OP_DELAY);
+                CLK_4MHZ();
             }
             LED1 = LED_RED;
             break;
@@ -130,7 +153,6 @@ switch_off(uint8_t n)
                 CLK_4MHZ();
             } else {
                 RELAY2_SET = CFG_OFF_STATE();
-                RELAY2_RESET = 0;
             }
             LED2 = LED_BLUE;
             break;
@@ -143,7 +165,6 @@ switch_off(uint8_t n)
                 CLK_4MHZ();
             } else {
                 RELAY1_SET = CFG_OFF_STATE();
-                RELAY1_RESET = 0;
             }
             LED1 = LED_BLUE;
             break;

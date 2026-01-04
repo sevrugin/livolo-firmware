@@ -10,9 +10,9 @@ extern uint8_t switchMode;
 extern uint8_t cfgTripThreshold;
 extern uint8_t cfgHystThreshold;
 
-short readCap = 0;
+volatile short readCap = 0;
 uint16_t x; // todo: error when delete this row
-long unsigned int microseconds = 0;
+volatile long unsigned int microseconds = 0;
 
 #define BLINK_MS  100
 
@@ -46,6 +46,9 @@ void interrupt isr()
     T0IF = 0;
     if (readCap > 0) {
         readCap--;
+        if (readCap == 0) {
+             TMR1ON = 0;
+        }
     } 
     microseconds++;
     
@@ -94,7 +97,7 @@ long unsigned int micro()
 /*
  * Private vars
  */
-static uint8_t avgs = 0;
+static uint8_t avgs[2] = {0, 0};
 
 /*
  * Public vars (for debugging from main)
@@ -102,7 +105,7 @@ static uint8_t avgs = 0;
 uint16_t cap_raw[2];
 uint16_t cap_rolling_avg[2] = {0,0}; // fixed point 12.4
 uint16_t cap_frozen_avg[2] = {0,0}; // fixed point 12.4
-uint8_t cap_cycles[2] = {0,0};
+uint16_t cap_cycles[2] = {0,0};
 
 uint8_t CM1(uint8_t n)
 {
@@ -209,7 +212,7 @@ capsensor_is_button_pressed(uint8_t n)
     if (cap_cycles[n] < READS_TO_SWITCH) {
         // 88 - 85 > 3 * 85 / 256
         // 3 > 9 * 0.3 (2.7)
-        if ((int16_t)(cap_raw[n] - cap_rolling_avg[n]) > (int16_t)(cap_rolling_avg[n] / 256 * cfgTripThreshold)) {
+        if ((int16_t)(cap_raw[n] - cap_rolling_avg[n]) > (int16_t)((uint32_t)cap_rolling_avg[n] * cfgTripThreshold / 256)) {
             cap_cycles[n]++;
             if (cap_cycles[n] >= READS_TO_SWITCH) {
                 do_switch = 1;
@@ -219,7 +222,7 @@ capsensor_is_button_pressed(uint8_t n)
             cap_cycles[n] = 0;
         }
     } else { // button is pressed
-        if ((int16_t)(cap_raw[n] - cap_frozen_avg[n]) > (int16_t)(cap_frozen_avg[n] / 256 * cfgHystThreshold)) {
+        if ((int16_t)(cap_raw[n] - cap_frozen_avg[n]) > (int16_t)((uint32_t)cap_frozen_avg[n] * cfgHystThreshold / 256)) {
             cap_cycles[n]++;
             if (RELAY_SWITCH_TYPE == 1 && cap_cycles[n] == 220) { //10 sec
 //                NO_SOCKET_MODE = NO_SOCKET_MODE? 0: 1;
@@ -228,6 +231,8 @@ capsensor_is_button_pressed(uint8_t n)
             }
             if (cap_cycles[n] >= RELEASE_TIMEOUT) {
                 cap_cycles[n] = 0;
+                cap_rolling_avg[n] = cap_raw[n];
+                cap_frozen_avg[n] = cap_raw[n];
             }
             if (CFG_BTN_TYPE() == 0) {
                 do_switch = 1; // signal should be ON
@@ -240,9 +245,9 @@ capsensor_is_button_pressed(uint8_t n)
     
     // when the button is tripped make the rolling every cycle in case we need
     // to adapt to the new situation fast (ie water drop)
-    avgs++;
-    if (cap_cycles[n] == 0 && (avgs % AVERAGING_RATE == 0)) {
-        cap_rolling_avg[n] = (cap_rolling_avg[n] * 15 + cap_raw[n]) / 16;
+    avgs[n]++;
+    if (cap_cycles[n] == 0 && (avgs[n] % AVERAGING_RATE == 0)) {
+        cap_rolling_avg[n] = ((uint32_t)cap_rolling_avg[n] * 15 + cap_raw[n]) / 16;
     }
     
     
